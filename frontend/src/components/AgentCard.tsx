@@ -53,15 +53,6 @@ export function AgentCard({ card }: Props) {
         >
           <Icon className={clsx("h-6 w-6", accent.text)} />
         </div>
-        <span
-          className={clsx(
-            "rounded-full px-2.5 py-1 text-[10px] uppercase tracking-wider",
-            accent.bgSoft,
-            accent.text
-          )}
-        >
-          {card.mode === "intent_once" ? "One-shot" : "Conversational"}
-        </span>
       </div>
 
       <h3 className="mt-6 font-display text-2xl font-semibold text-offwhite">

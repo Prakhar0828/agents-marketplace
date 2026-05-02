@@ -28,6 +28,13 @@ interface CompetitorPayload {
   csvUrl: string | null;
 }
 
+interface MediaTablePayload {
+  title: string;
+  columns: string[];
+  rows: string[][];
+  csvUrl: string | null;
+}
+
 interface ResumePayload {
   jobTitle: string;
   company: string;
@@ -43,12 +50,14 @@ function reduceEvents(events: ChatEvent[]): {
   leads: LeadsPayload | null;
   competitors: CompetitorPayload | null;
   resume: ResumePayload | null;
+  mediaTable: MediaTablePayload | null;
 } {
   const bubbles: ChatBubble[] = [];
   const timeline: TimelineItem[] = [];
   let leads: LeadsPayload | null = null;
   let competitors: CompetitorPayload | null = null;
   let resume: ResumePayload | null = null;
+  let mediaTable: MediaTablePayload | null = null;
 
   events.forEach((evt, idx) => {
     const id = `e${idx}`;
@@ -116,6 +125,14 @@ function reduceEvents(events: ChatEvent[]): {
           csvUrl: evt.csv_url,
         };
         break;
+      case "media_table":
+        mediaTable = {
+          title: evt.title,
+          columns: evt.columns,
+          rows: evt.rows,
+          csvUrl: evt.csv_url,
+        };
+        break;
       case "error":
         timeline.push({ id, kind: "error", message: evt.message, ts });
         break;
@@ -124,7 +141,7 @@ function reduceEvents(events: ChatEvent[]): {
     }
   });
 
-  return { bubbles, timeline, leads, competitors, resume };
+  return { bubbles, timeline, leads, competitors, resume, mediaTable };
 }
 
 export function ChatRoom() {
@@ -142,7 +159,7 @@ export function ChatRoom() {
 
   const { events, send, thinking, status } = useAgentSocket(agentId);
 
-  const { bubbles, timeline, leads, competitors, resume } = useMemo(
+  const { bubbles, timeline, leads, competitors, resume, mediaTable } = useMemo(
     () => reduceEvents(events),
     [events]
   );
@@ -214,6 +231,7 @@ export function ChatRoom() {
             leads={leads}
             competitors={competitors}
             resume={resume}
+            mediaTable={mediaTable}
             onSend={(text, resumeFileId) =>
               send(text, resumeFileId ? { resume_file_id: resumeFileId } : undefined)
             }
@@ -225,9 +243,6 @@ export function ChatRoom() {
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs uppercase tracking-[0.25em] text-muted">
               Run timeline
-            </span>
-            <span className={clsx("text-[10px] uppercase", a.text)}>
-              {card.mode === "intent_once" ? "One-shot" : "Agentic loop"}
             </span>
           </div>
           <ProgressTimeline items={timeline} accent={card.accent} />

@@ -41,21 +41,21 @@ REGISTRY: dict[str, RegistryEntry] = {
     "sales-lead": RegistryEntry(
         card=AgentCard(
             id="sales-lead",
-            name="Sales Lead Agent",
-            tagline="Find and score B2B leads from Google Maps + Instagram",
+            name="Sales Leads Finder Agent",
+            tagline="Build a qualified prospect list for any niche in any city",
             description=(
-                "Describe your ideal customer (niche + city) and I'll pull real "
-                "businesses from Google Maps and matching Instagram profiles, "
-                "merge duplicates, and score every lead with GPT. You'll get a "
-                "ranked table and a downloadable CSV."
+                "Tell me your target market and location, and I'll find real "
+                "businesses with contact details, social profiles, ratings, and "
+                "reviews — then rank them by fit so you can focus on the "
+                "highest-value prospects first. Download the full list as a CSV."
             ),
             accent="emerald",
             icon="target",
             mode="intent_once",
             capabilities=[
-                "Google Maps scraping",
-                "Instagram hashtag & profile lookup",
-                "GPT-powered scoring",
+                "Local business discovery",
+                "Contact & social profiles",
+                "Automated lead scoring",
                 "CSV export",
             ],
         ),
@@ -63,7 +63,7 @@ REGISTRY: dict[str, RegistryEntry] = {
         handler=lead_agent.run_lead_agent,
         new_state=lead_agent.new_state,
         greeting=(
-            "Hi! I'm your Sales Lead Agent. Tell me the niche and city you're "
+            "Hi! I'm your Sales Leads Finder. Tell me the niche and city you're "
             "targeting — e.g. \"Find 15 yoga studios in Mumbai\" — and I'll pull "
             "a ranked list of leads."
         ),
@@ -72,19 +72,20 @@ REGISTRY: dict[str, RegistryEntry] = {
         card=AgentCard(
             id="media-analyser",
             name="Content Research Agent",
-            tagline="Analyse YouTube & Instagram content with an agentic loop",
+            tagline="Understand what content is winning in your space",
             description=(
-                "Ask anything about a creator, hashtag, reel, or YouTube topic. "
-                "I call the right Apify actor, analyse engagement trends, and "
-                "summarise what's working. Conversational — keep asking follow-ups."
+                "Curious what your competitors are posting, which topics trend, or "
+                "how a creator's audience engages? Ask in plain English and get "
+                "engagement breakdowns, top-performing content, and actionable "
+                "insights you can use to plan your next campaign."
             ),
             accent="violet",
             icon="sparkles",
             mode="agentic_loop",
             capabilities=[
-                "YouTube search & comment mining",
-                "Instagram profile / reel / hashtag scraping",
+                "YouTube & Instagram research",
                 "Engagement & trend analysis",
+                "Top-performing content discovery",
                 "Multi-turn follow-ups",
             ],
         ),
@@ -101,22 +102,21 @@ REGISTRY: dict[str, RegistryEntry] = {
         card=AgentCard(
             id="competitor-analysis",
             name="Competitor Analysis Agent",
-            tagline="Scrape & compare competitor websites — pricing, features, positioning",
+            tagline="Know exactly how your competitors price, position, and sell",
             description=(
-                "Give me a list of competitor companies or URLs and I'll crawl "
-                "their websites, extract pricing tiers, features, positioning, "
-                "and tech stack info, then present a side-by-side comparison "
-                "with a downloadable CSV."
+                "Give me your competitors' names or websites and I'll map out "
+                "their pricing, key features, market positioning, and more — "
+                "side by side. Download the comparison as a CSV so your team "
+                "can build a winning strategy."
             ),
             accent="amber",
             icon="crosshair",
             mode="intent_once",
             capabilities=[
-                "Website content crawling (Apify)",
-                "Pricing & feature extraction",
-                "Positioning & tech-stack analysis",
-                "Side-by-side comparison table",
-                "CSV export",
+                "Competitor website research",
+                "Pricing & feature comparison",
+                "Market positioning insights",
+                "Downloadable comparison table",
             ],
         ),
         actors=COMPETITOR_ACTORS,
@@ -132,21 +132,21 @@ REGISTRY: dict[str, RegistryEntry] = {
         card=AgentCard(
             id="resume-optimizer",
             name="AI Resume Optimizer",
-            tagline="Tailor your resume to any LinkedIn job with one upload",
+            tagline="Land more interviews with a resume tailored to the exact role",
             description=(
-                "Attach your resume as a PDF, tell me the job title and company, "
-                "and I'll scrape the LinkedIn listing, rewrite your resume to "
-                "match the role's language, and hand back editable Markdown "
-                "and .docx files."
+                "Upload your resume and tell me the job title + company. I'll "
+                "pull the real job description, rewrite your resume to match "
+                "the role's language and keywords, and deliver an interview-ready "
+                "version you can download instantly."
             ),
             accent="cyan",
             icon="file-text",
             mode="intent_once",
             capabilities=[
-                "PDF resume parsing",
-                "LinkedIn job scraping (bebity actor)",
-                "GPT-tailored rewrite (keywords + bullets)",
-                "Markdown + .docx export",
+                "Resume parsing & analysis",
+                "Job description matching",
+                "Keyword-optimized rewrite",
+                "Instant download (Markdown + Word)",
             ],
         ),
         actors=RESUME_ACTORS,

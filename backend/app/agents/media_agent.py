@@ -8,12 +8,15 @@ timeline alongside the chat transcript.
 
 from __future__ import annotations
 
+import csv
 import json
+import textwrap
+from datetime import datetime
 from typing import Any, Awaitable, Callable
 
 from openai import OpenAI
 
-from ..config import MODEL
+from ..config import DOWNLOADS_DIR, MODEL
 from ..mcp_client import LenientClientSession, call_tool
 
 Emit = Callable[[dict], Awaitable[None]]
@@ -140,4 +143,87 @@ async def run_media_agent(
 
         reply = message.content or ""
         await emit({"type": "assistant_message", "text": reply})
+
+        # After the main reply, try to extract structured tabular data from
+        # the tool results. This gives the user a scannable table + CSV.
+        await _maybe_emit_table(openai_client, conversation, emit)
         return
+
+
+# ── Table extraction ──────────────────────────────────────────────────────────
+
+TABLE_EXTRACT_PROMPT = textwrap.dedent("""\
+    You just analysed media data. If the conversation contains data that would
+    be useful as a table (e.g. list of videos, posts, profiles, or metrics),
+    extract it into structured JSON.
+
+    Return JSON:
+    {
+      "has_table": true/false,
+      "title": "short title for the table",
+      "columns": ["Col1", "Col2", ...],
+      "rows": [["val1", "val2", ...], ...]
+    }
+
+    Rules:
+    - Only set has_table=true if there are 2+ items with consistent fields.
+    - Keep it to the most relevant 5-8 columns max.
+    - Include URLs, counts, engagement metrics, dates where available.
+    - If there's no tabular data, return {"has_table": false}.
+""")
+
+
+def _save_media_csv(title: str, columns: list[str], rows: list[list[str]]) -> str:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    slug = title.lower().replace(" ", "_")[:30]
+    filename = f"media_{slug}_{timestamp}.csv"
+    path = DOWNLOADS_DIR / filename
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(columns)
+        for row in rows:
+            writer.writerow(row)
+    return filename
+
+
+async def _maybe_emit_table(
+    client: OpenAI,
+    conversation: list[dict],
+    emit: Emit,
+) -> None:
+    """Ask GPT to extract tabular data from the conversation and emit it."""
+    # Only send the last few messages to keep the extraction focused and cheap.
+    recent = conversation[-6:]
+    try:
+        resp = client.chat.completions.create(
+            model=MODEL,
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": TABLE_EXTRACT_PROMPT},
+                *[m for m in recent if isinstance(m, dict)],
+            ],
+        )
+        data = json.loads(resp.choices[0].message.content)
+    except Exception:
+        return
+
+    if not data.get("has_table") or not data.get("rows"):
+        return
+
+    columns: list[str] = data.get("columns", [])
+    rows: list[list[str]] = data.get("rows", [])
+    title: str = data.get("title", "Media Research Results")
+
+    if not columns or not rows:
+        return
+
+    filename = _save_media_csv(title, columns, rows)
+    await emit(
+        {
+            "type": "media_table",
+            "title": title,
+            "columns": columns,
+            "rows": rows,
+            "csv_url": f"/api/downloads/{filename}",
+        }
+    )

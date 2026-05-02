@@ -113,6 +113,16 @@ class CompetitorResultEvent(BaseModel):
     csv_url: str | None = None
 
 
+class MediaTableEvent(BaseModel):
+    """Structured table output from the Content Research agent."""
+
+    type: Literal["media_table"] = "media_table"
+    title: str
+    columns: list[str]
+    rows: list[list[str]]
+    csv_url: str | None = None
+
+
 class DoneEvent(BaseModel):
     type: Literal["done"] = "done"
 
@@ -132,6 +142,7 @@ ChatEvent = (
     | LeadsTableEvent
     | ResumeResultEvent
     | CompetitorResultEvent
+    | MediaTableEvent
     | DoneEvent
     | ErrorEvent
 )

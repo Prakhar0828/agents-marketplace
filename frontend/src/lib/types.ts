@@ -63,6 +63,13 @@ export type ChatEvent =
       rows: CompetitorRow[];
       csv_url: string | null;
     }
+  | {
+      type: "media_table";
+      title: string;
+      columns: string[];
+      rows: string[][];
+      csv_url: string | null;
+    }
   | { type: "done" }
   | { type: "error"; message: string };
 

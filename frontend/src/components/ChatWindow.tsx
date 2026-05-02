@@ -7,6 +7,7 @@ import { uploadResume } from "../lib/api";
 import { MessageBubble } from "./MessageBubble";
 import { CompetitorTable } from "./CompetitorTable";
 import { LeadsTable } from "./LeadsTable";
+import { MediaTable } from "./MediaTable";
 import { ResumeResult } from "./ResumeResult";
 
 interface ResumePayload {
@@ -30,6 +31,13 @@ interface CompetitorPayload {
   csvUrl: string | null;
 }
 
+interface MediaTablePayload {
+  title: string;
+  columns: string[];
+  rows: string[][];
+  csvUrl: string | null;
+}
+
 interface Attachment {
   id: string;
   filename: string;
@@ -49,6 +57,7 @@ interface Props {
   leads?: LeadsPayload | null;
   competitors?: CompetitorPayload | null;
   resume?: ResumePayload | null;
+  mediaTable?: MediaTablePayload | null;
   onSend: (text: string, resumeFileId?: string) => void;
 }
 
@@ -67,6 +76,7 @@ export function ChatWindow({
   leads,
   competitors,
   resume,
+  mediaTable,
   onSend,
 }: Props) {
   const [draft, setDraft] = useState("");
@@ -83,7 +93,7 @@ export function ChatWindow({
       top: scrollRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [bubbles.length, thinking, leads?.rows.length, competitors?.rows.length, resume?.markdown]);
+  }, [bubbles.length, thinking, leads?.rows.length, competitors?.rows.length, resume?.markdown, mediaTable?.rows.length]);
 
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -155,6 +165,14 @@ export function ChatWindow({
             mdUrl={resume.mdUrl}
             docxUrl={resume.docxUrl}
             summary={resume.summary}
+          />
+        )}
+        {mediaTable && (
+          <MediaTable
+            title={mediaTable.title}
+            columns={mediaTable.columns}
+            rows={mediaTable.rows}
+            csvUrl={mediaTable.csvUrl}
           />
         )}
         {thinking && (

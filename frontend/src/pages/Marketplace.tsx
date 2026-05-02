@@ -28,13 +28,12 @@ export function Marketplace() {
       </header>
 
       <h1 className="mt-10 max-w-3xl font-display text-5xl font-semibold leading-tight">
-        Hire a specialist agent.{" "}
-        <span className="text-muted">Get real data back.</span>
+        Hire a specialist agent to 2x your business.
       </h1>
       <p className="mt-5 max-w-2xl text-base leading-relaxed text-offwhite/80">
-        Each agent is a purpose-built worker wired to live tools via Apify MCP
-        and OpenAI. Pick one, describe what you need in plain English, and
-        watch it stream results back in real time.
+        Each agent is a purpose-built worker that delivers real, actionable
+        results in minutes — not days. Pick one, describe what you need in
+        plain English, and get structured data you can act on immediately.
       </p>
 
       <section className="mt-16">
