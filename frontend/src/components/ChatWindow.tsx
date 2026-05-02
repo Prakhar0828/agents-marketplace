@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, FileText, Paperclip, X } from "lucide-react";
 import clsx from "clsx";
-import type { AgentAccent, ChatBubble, Lead } from "../lib/types";
+import type { AgentAccent, ChatBubble, CompetitorRow, Lead } from "../lib/types";
 import { ACCENTS } from "../lib/accent";
 import { uploadResume } from "../lib/api";
 import { MessageBubble } from "./MessageBubble";
+import { CompetitorTable } from "./CompetitorTable";
 import { LeadsTable } from "./LeadsTable";
 import { ResumeResult } from "./ResumeResult";
 
@@ -21,6 +22,11 @@ interface LeadsPayload {
   rows: Lead[];
   niche: string;
   location: string;
+  csvUrl: string | null;
+}
+
+interface CompetitorPayload {
+  rows: CompetitorRow[];
   csvUrl: string | null;
 }
 
@@ -41,6 +47,7 @@ interface Props {
   // When set, renders results inline at the bottom of the transcript so the
   // user sees the output right where they're reading.
   leads?: LeadsPayload | null;
+  competitors?: CompetitorPayload | null;
   resume?: ResumePayload | null;
   onSend: (text: string, resumeFileId?: string) => void;
 }
@@ -58,6 +65,7 @@ export function ChatWindow({
   disabled,
   allowResumeUpload,
   leads,
+  competitors,
   resume,
   onSend,
 }: Props) {
@@ -75,7 +83,7 @@ export function ChatWindow({
       top: scrollRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [bubbles.length, thinking, leads?.rows.length, resume?.markdown]);
+  }, [bubbles.length, thinking, leads?.rows.length, competitors?.rows.length, resume?.markdown]);
 
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -131,6 +139,12 @@ export function ChatWindow({
             niche={leads.niche}
             location={leads.location}
             csvUrl={leads.csvUrl}
+          />
+        )}
+        {competitors && (
+          <CompetitorTable
+            rows={competitors.rows}
+            csvUrl={competitors.csvUrl}
           />
         )}
         {resume && (

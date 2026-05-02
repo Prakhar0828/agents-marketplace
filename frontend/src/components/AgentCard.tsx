@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   ArrowUpRight,
+  Crosshair,
   FileText,
   Sparkles,
   Target,
@@ -15,6 +16,7 @@ const ICONS: Record<string, LucideIcon> = {
   target: Target,
   sparkles: Sparkles,
   "file-text": FileText,
+  crosshair: Crosshair,
 };
 
 interface Props {

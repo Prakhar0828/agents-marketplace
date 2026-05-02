@@ -1,6 +1,6 @@
 // Mirror of backend/app/models.py Pydantic models. Keep in sync by hand.
 
-export type AgentAccent = "emerald" | "violet" | "cyan";
+export type AgentAccent = "emerald" | "violet" | "cyan" | "amber";
 export type AgentMode = "intent_once" | "agentic_loop";
 
 export interface AgentCard {
@@ -58,8 +58,23 @@ export type ChatEvent =
       docx_url: string;
       summary: string;
     }
+  | {
+      type: "competitor_result";
+      rows: CompetitorRow[];
+      csv_url: string | null;
+    }
   | { type: "done" }
   | { type: "error"; message: string };
+
+export interface CompetitorRow {
+  company: string;
+  url: string;
+  pricing: string;
+  features: string;
+  positioning: string;
+  tech_stack: string;
+  notable: string;
+}
 
 // Transcript item types (reconstructed on the client from ChatEvents).
 export type BubbleRole = "user" | "assistant";

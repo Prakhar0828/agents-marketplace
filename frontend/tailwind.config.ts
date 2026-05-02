@@ -36,9 +36,11 @@ export default {
         "bloom-emerald": "0 0 60px 0 rgba(62, 255, 158, 0.08)",
         "bloom-violet": "0 0 60px 0 rgba(176, 124, 255, 0.1)",
         "bloom-cyan": "0 0 60px 0 rgba(94, 225, 255, 0.1)",
+        "bloom-amber": "0 0 60px 0 rgba(255, 184, 77, 0.1)",
         "glow-emerald": "0 0 15px 0 rgba(62, 255, 158, 0.35)",
         "glow-violet": "0 0 15px 0 rgba(176, 124, 255, 0.35)",
         "glow-cyan": "0 0 15px 0 rgba(94, 225, 255, 0.4)",
+        "glow-amber": "0 0 15px 0 rgba(255, 184, 77, 0.35)",
       },
       animation: {
         pulseDot: "pulseDot 1.6s ease-in-out infinite",

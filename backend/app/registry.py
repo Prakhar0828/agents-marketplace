@@ -12,8 +12,14 @@ from typing import Awaitable, Callable
 
 from openai import OpenAI
 
-from .agents import lead_agent, media_agent, resume_agent
-from .mcp_client import LEAD_ACTORS, MEDIA_ACTORS, RESUME_ACTORS, LenientClientSession
+from .agents import competitor_agent, lead_agent, media_agent, resume_agent
+from .mcp_client import (
+    COMPETITOR_ACTORS,
+    LEAD_ACTORS,
+    MEDIA_ACTORS,
+    RESUME_ACTORS,
+    LenientClientSession,
+)
 from .models import AgentCard
 
 Handler = Callable[
@@ -89,6 +95,37 @@ REGISTRY: dict[str, RegistryEntry] = {
             "Hi! I'm your Content Research Agent. Ask me about any YouTube topic "
             "or Instagram profile/hashtag/reel and I'll pull live data and surface "
             "the insights."
+        ),
+    ),
+    "competitor-analysis": RegistryEntry(
+        card=AgentCard(
+            id="competitor-analysis",
+            name="Competitor Analysis Agent",
+            tagline="Scrape & compare competitor websites — pricing, features, positioning",
+            description=(
+                "Give me a list of competitor companies or URLs and I'll crawl "
+                "their websites, extract pricing tiers, features, positioning, "
+                "and tech stack info, then present a side-by-side comparison "
+                "with a downloadable CSV."
+            ),
+            accent="amber",
+            icon="crosshair",
+            mode="intent_once",
+            capabilities=[
+                "Website content crawling (Apify)",
+                "Pricing & feature extraction",
+                "Positioning & tech-stack analysis",
+                "Side-by-side comparison table",
+                "CSV export",
+            ],
+        ),
+        actors=COMPETITOR_ACTORS,
+        handler=competitor_agent.run_competitor_agent,
+        new_state=competitor_agent.new_state,
+        greeting=(
+            "Hi! I'm your Competitor Analysis Agent. Tell me which competitors "
+            "you'd like to research — company names or URLs both work. "
+            "For example: *\"Analyse stripe.com, lemonsqueezy.com, and paddle.com\"*"
         ),
     ),
     "resume-optimizer": RegistryEntry(

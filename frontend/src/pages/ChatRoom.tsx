@@ -6,6 +6,7 @@ import type {
   AgentCard,
   ChatBubble,
   ChatEvent,
+  CompetitorRow,
   Lead,
   TimelineItem,
 } from "../lib/types";
@@ -22,6 +23,11 @@ interface LeadsPayload {
   csvUrl: string | null;
 }
 
+interface CompetitorPayload {
+  rows: CompetitorRow[];
+  csvUrl: string | null;
+}
+
 interface ResumePayload {
   jobTitle: string;
   company: string;
@@ -35,11 +41,13 @@ function reduceEvents(events: ChatEvent[]): {
   bubbles: ChatBubble[];
   timeline: TimelineItem[];
   leads: LeadsPayload | null;
+  competitors: CompetitorPayload | null;
   resume: ResumePayload | null;
 } {
   const bubbles: ChatBubble[] = [];
   const timeline: TimelineItem[] = [];
   let leads: LeadsPayload | null = null;
+  let competitors: CompetitorPayload | null = null;
   let resume: ResumePayload | null = null;
 
   events.forEach((evt, idx) => {
@@ -102,6 +110,12 @@ function reduceEvents(events: ChatEvent[]): {
           summary: evt.summary,
         };
         break;
+      case "competitor_result":
+        competitors = {
+          rows: evt.rows,
+          csvUrl: evt.csv_url,
+        };
+        break;
       case "error":
         timeline.push({ id, kind: "error", message: evt.message, ts });
         break;
@@ -110,7 +124,7 @@ function reduceEvents(events: ChatEvent[]): {
     }
   });
 
-  return { bubbles, timeline, leads, resume };
+  return { bubbles, timeline, leads, competitors, resume };
 }
 
 export function ChatRoom() {
@@ -128,7 +142,7 @@ export function ChatRoom() {
 
   const { events, send, thinking, status } = useAgentSocket(agentId);
 
-  const { bubbles, timeline, leads, resume } = useMemo(
+  const { bubbles, timeline, leads, competitors, resume } = useMemo(
     () => reduceEvents(events),
     [events]
   );
@@ -198,6 +212,7 @@ export function ChatRoom() {
             disabled={!connected}
             allowResumeUpload={card.id === "resume-optimizer"}
             leads={leads}
+            competitors={competitors}
             resume={resume}
             onSend={(text, resumeFileId) =>
               send(text, resumeFileId ? { resume_file_id: resumeFileId } : undefined)

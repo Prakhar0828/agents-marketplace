@@ -48,4 +48,15 @@ export const ACCENTS: Record<AgentAccent, AccentClasses> = {
     cta: "btn-primary btn-primary-cyan",
     timelineDot: "bg-neon-cyan",
   },
+  amber: {
+    text: "text-neon-amber",
+    bg: "bg-neon-amber",
+    bgSoft: "bg-neon-amber/10",
+    ring: "ring-neon-amber/30",
+    glow: "shadow-bloom-amber hover:shadow-glow-amber",
+    gradient:
+      "bg-[linear-gradient(135deg,#FFD45E_0%,#D4A01B_100%)] text-deepspace",
+    cta: "btn-primary btn-primary-amber",
+    timelineDot: "bg-neon-amber",
+  },
 };

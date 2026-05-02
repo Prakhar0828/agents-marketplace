@@ -39,6 +39,10 @@ RESUME_ACTORS = [
     "bebity/linkedin-jobs-scraper",
 ]
 
+COMPETITOR_ACTORS = [
+    "apify/website-content-crawler",
+]
+
 
 class LenientClientSession(ClientSession):
     """Skip strict output-schema validation — Apify actors use non-standard types."""

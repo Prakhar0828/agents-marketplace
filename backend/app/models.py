@@ -95,6 +95,24 @@ class ResumeResultEvent(BaseModel):
     summary: str = ""  # one-paragraph summary of what changed
 
 
+class CompetitorRow(BaseModel):
+    company: str
+    url: str
+    pricing: str
+    features: str
+    positioning: str
+    tech_stack: str
+    notable: str
+
+
+class CompetitorResultEvent(BaseModel):
+    """Competitive analysis output — table of competitors + CSV download."""
+
+    type: Literal["competitor_result"] = "competitor_result"
+    rows: list[CompetitorRow]
+    csv_url: str | None = None
+
+
 class DoneEvent(BaseModel):
     type: Literal["done"] = "done"
 
@@ -113,6 +131,7 @@ ChatEvent = (
     | IntentEvent
     | LeadsTableEvent
     | ResumeResultEvent
+    | CompetitorResultEvent
     | DoneEvent
     | ErrorEvent
 )
