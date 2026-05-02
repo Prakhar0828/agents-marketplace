@@ -123,15 +123,16 @@ async def _crawl_website(
     """Crawl a competitor's website and return the combined text content."""
     inputs: dict[str, Any] = {
         "startUrls": [{"url": url}],
-        "maxCrawlPages": 10,
+        "maxCrawlPages": 15,
         "crawlerType": "cheerio",
+        "proxyConfiguration": {"useApifyProxy": True},
     }
 
     await emit(
         {
             "type": "tool_call",
             "name": "apify--website-content-crawler",
-            "args": {"url": url, "company": company_name, "maxPages": 10},
+            "args": {"url": url, "company": company_name, "maxPages": 15},
         }
     )
 
@@ -152,10 +153,18 @@ async def _crawl_website(
 
     if isinstance(data, list):
         for item in data:
-            if isinstance(item, dict):
-                text = item.get("text") or item.get("markdown") or item.get("body") or ""
-                if text:
-                    pages.append(text[:3000])
+            if not isinstance(item, dict):
+                continue
+            # Prefer markdown (richer for JS-rendered sites), fall back to text.
+            text = item.get("markdown") or item.get("text") or ""
+            if len(text) < 50:
+                # If both markdown and text are too sparse, try metadata desc.
+                meta = item.get("metadata") or {}
+                desc = meta.get("description") or ""
+                title = meta.get("title") or ""
+                text = f"{title}\n{desc}" if desc else text
+            if text.strip():
+                pages.append(text[:4000])
         await emit(
             {
                 "type": "tool_result",
@@ -164,9 +173,9 @@ async def _crawl_website(
             }
         )
     elif isinstance(data, dict):
-        text = data.get("text") or data.get("markdown") or data.get("body") or ""
-        if text:
-            pages.append(text[:3000])
+        text = data.get("markdown") or data.get("text") or ""
+        if text.strip():
+            pages.append(text[:4000])
         await emit(
             {
                 "type": "tool_result",
@@ -183,7 +192,7 @@ async def _crawl_website(
             }
         )
 
-    return "\n\n---\n\n".join(pages)[:12000]
+    return "\n\n---\n\n".join(pages)[:15000]
 
 
 # ── GPT analysis ──────────────────────────────────────────────────────────────
