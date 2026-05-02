@@ -14,7 +14,6 @@ import { useAgentSocket } from "../lib/useAgentSocket";
 import { ACCENTS } from "../lib/accent";
 import { ChatWindow } from "../components/ChatWindow";
 import { ProgressTimeline } from "../components/ProgressTimeline";
-import { LeadsTable } from "../components/LeadsTable";
 
 interface LeadsPayload {
   rows: Lead[];
@@ -198,6 +197,7 @@ export function ChatRoom() {
             thinking={thinking}
             disabled={!connected}
             allowResumeUpload={card.id === "resume-optimizer"}
+            leads={leads}
             resume={resume}
             onSend={(text, resumeFileId) =>
               send(text, resumeFileId ? { resume_file_id: resumeFileId } : undefined)
@@ -216,14 +216,6 @@ export function ChatRoom() {
             </span>
           </div>
           <ProgressTimeline items={timeline} accent={card.accent} />
-          {leads && (
-            <LeadsTable
-              rows={leads.rows}
-              niche={leads.niche}
-              location={leads.location}
-              csvUrl={leads.csvUrl}
-            />
-          )}
         </aside>
       </div>
     </div>

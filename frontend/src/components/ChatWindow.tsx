@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, FileText, Paperclip, X } from "lucide-react";
 import clsx from "clsx";
-import type { AgentAccent, ChatBubble } from "../lib/types";
+import type { AgentAccent, ChatBubble, Lead } from "../lib/types";
 import { ACCENTS } from "../lib/accent";
 import { uploadResume } from "../lib/api";
 import { MessageBubble } from "./MessageBubble";
+import { LeadsTable } from "./LeadsTable";
 import { ResumeResult } from "./ResumeResult";
 
 interface ResumePayload {
@@ -14,6 +15,13 @@ interface ResumePayload {
   mdUrl: string;
   docxUrl: string;
   summary: string;
+}
+
+interface LeadsPayload {
+  rows: Lead[];
+  niche: string;
+  location: string;
+  csvUrl: string | null;
 }
 
 interface Attachment {
@@ -30,8 +38,9 @@ interface Props {
   // When true, show the paperclip + allow attaching a resume PDF. Used only
   // for the resume-optimizer agent to keep the other chat UIs minimal.
   allowResumeUpload?: boolean;
-  // When set, renders the optimized resume inline at the bottom of the
-  // transcript so the user sees the output right where they're reading.
+  // When set, renders results inline at the bottom of the transcript so the
+  // user sees the output right where they're reading.
+  leads?: LeadsPayload | null;
   resume?: ResumePayload | null;
   onSend: (text: string, resumeFileId?: string) => void;
 }
@@ -48,6 +57,7 @@ export function ChatWindow({
   thinking,
   disabled,
   allowResumeUpload,
+  leads,
   resume,
   onSend,
 }: Props) {
@@ -65,7 +75,7 @@ export function ChatWindow({
       top: scrollRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [bubbles.length, thinking, resume?.markdown]);
+  }, [bubbles.length, thinking, leads?.rows.length, resume?.markdown]);
 
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -115,6 +125,14 @@ export function ChatWindow({
         {bubbles.map((b) => (
           <MessageBubble key={b.id} bubble={b} accent={accent} />
         ))}
+        {leads && (
+          <LeadsTable
+            rows={leads.rows}
+            niche={leads.niche}
+            location={leads.location}
+            csvUrl={leads.csvUrl}
+          />
+        )}
         {resume && (
           <ResumeResult
             jobTitle={resume.jobTitle}
