@@ -1,0 +1,48 @@
+# Render Blueprint — single service that builds the Vite frontend, installs
+# Python deps, and runs FastAPI (which serves both the SPA and the WebSocket
+# chat). Deploy path: Render dashboard → New → Blueprint → point at this repo.
+#
+# After the first deploy, set these two secrets in Render's Environment tab:
+#   OPENAI_API_KEY   — from platform.openai.com
+#   APIFY_API_TOKEN  — from console.apify.com/settings/integrations
+#
+# Render will mirror those into the running container on every deploy.
+
+services:
+  - type: web
+    name: agent-marketplace
+    runtime: python
+    plan: free
+    region: oregon
+    # Build the frontend first, then install Python deps. Render caches
+    # node_modules and the pip cache between deploys, so incremental builds
+    # are fast.
+    buildCommand: |
+      set -euo pipefail
+      cd frontend
+      npm ci
+      npm run build
+      cd ..
+      pip install --upgrade pip
+      pip install -r backend/requirements.txt
+    # Uvicorn binds to the port Render injects. `--ws websockets` is
+    # already the default but we're explicit so it's obvious WebSockets
+    # are wired.
+    startCommand: |
+      cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --ws websockets
+    healthCheckPath: /api/health
+    # Python version must match what we develop against. 3.11 is the
+    # lowest version that has the builtin ExceptionGroup we rely on in
+    # backend/app/routes/chat.py.
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Secrets — set their values in the Render dashboard (sync:false
+      # means "don't commit a value, ask me at deploy time").
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: APIFY_API_TOKEN
+        sync: false
+      # Optional: override which OpenAI model the agents use.
+      - key: OPENAI_MODEL
+        value: gpt-5.4

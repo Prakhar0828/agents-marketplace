@@ -1,0 +1,45 @@
+# ── Secrets & local env ──────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# ── Node / Vite ──────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite build output. Render builds it fresh on every deploy, so we don't
+# commit it — this also keeps the repo slim.
+frontend/dist/
+
+# TypeScript incremental-build cache — machine-specific, regenerated on
+# every `tsc -b`.
+*.tsbuildinfo
+
+# ── Agent runtime artifacts ──────────────────────────────────────────────────
+# User-uploaded resumes and generated exports are per-session and shouldn't
+# be versioned. The app recreates these dirs on startup.
+backend/uploads/
+backend/downloads/
+
+# ── OS / editor noise ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
